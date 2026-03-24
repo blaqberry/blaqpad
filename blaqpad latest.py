@@ -15,23 +15,29 @@ import numpy as np
 from PyQt6.QtWidgets import (
     QApplication, QWidget, QPushButton, QFileDialog, QGridLayout,
     QVBoxLayout, QHBoxLayout, QLabel, QComboBox, QDialog,
-    QLineEdit, QMessageBox, QTabWidget, QTextEdit, QCheckBox
+    QLineEdit, QMessageBox, QTabWidget, QTextEdit, QCheckBox, QSplashScreen
 )
 from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import QIcon, QPixmap
 
-# --- Icon embedded ---
+# --- Boot logo (base64 image provided by user) ---
+SPLASH_BASE64 = "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"
+
+def get_splash_pixmap():
+    data = base64.b64decode(SPLASH_BASE64)
+    pixmap = QPixmap()
+    pixmap.loadFromData(data, "PNG")
+    return pixmap
+
+# --- Icon embedded (same as splash) ---
 def get_icon():
-    icon_base64 = "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"
-    if icon_base64:
-        data = base64.b64decode(icon_base64)
-        pixmap = QPixmap()
-        pixmap.loadFromData(data, "PNG")
+    pixmap = get_splash_pixmap()
+    if not pixmap.isNull():
         return QIcon(pixmap)
     return None
-
 # --- Audio init ---
 pygame.mixer.init(frequency=44100, channels=2, size=-16, buffer=512)
+pygame.mixer.set_num_channels(64)   # Allocate enough channels for loops and one‑shot sounds
 SAMPLE_RATE = 44100
 
 # --- File handling ---
@@ -102,7 +108,7 @@ HELP_TEXT = """
 
 ABOUT_TEXT = """
 <strong>blaqpad – Launchpad Looper</strong><br/>
-Version 1.0 i guess...<br/><br/>
+Version 1.0.1 i guess...<br/><br/>
 A "powerful" looper and sampler designed for Novation Launchpad controllers. (Specifically LP Mini)<br/>
 Create loops, assign samples, record your sessions, and manage your projects.<br/><br/>
 Created by blaqberry.<br/>
@@ -167,7 +173,8 @@ def reload_all_sounds():
         if path and os.path.exists(path):
             load_sound(note, path)
 
-def play_sound_with_pitch(note, pitch=1.0):
+def play_sound_with_params(note, pitch, volume):
+    """Play a note with given pitch and volume. Returns the mixer channel used."""
     if note not in raw_arrays:
         return None
     arr = raw_arrays[note]
@@ -175,7 +182,7 @@ def play_sound_with_pitch(note, pitch=1.0):
     indices = indices[indices < len(arr)].astype(int)
     resampled = arr[indices]
     snd = pygame.sndarray.make_sound(resampled)
-    snd.set_volume(current_volume)
+    snd.set_volume(volume)
     channel = pygame.mixer.find_channel()
     if channel:
         channel.play(snd)
@@ -184,16 +191,20 @@ def play_sound_with_pitch(note, pitch=1.0):
         snd.play()
         return None
 
+def play_sound_with_pitch(note, pitch=1.0):
+    """Legacy: use current global volume."""
+    return play_sound_with_params(note, pitch, current_volume)
+
 # --- Session recording (internal) ---
 session_recording = False
 session_start_time = 0.0
-session_events = []  # each event: (time_offset, note, pitch)
+session_events = []  # each event: (time_offset, note, pitch, volume)
 
 def render_session_to_wav(events, filename=None):
     if not events:
         return None
     total_duration = 0
-    for t, note, pitch in events:
+    for t, note, pitch, volume in events:
         if note in raw_arrays:
             arr = raw_arrays[note]
             indices = np.arange(0, len(arr), 1 / pitch)
@@ -205,13 +216,13 @@ def render_session_to_wav(events, filename=None):
     total_samples = int(total_duration * SAMPLE_RATE)
     mix_buffer = np.zeros((total_samples, 2), dtype=np.int16)
 
-    for t, note, pitch in events:
+    for t, note, pitch, volume in events:
         if note not in raw_arrays:
             continue
         arr = raw_arrays[note]
         indices = np.arange(0, len(arr), 1 / pitch)
         indices = indices[indices < len(arr)].astype(int)
-        resampled = arr[indices]
+        resampled = arr[indices] * volume  # apply volume
         start_sample = int(t * SAMPLE_RATE)
         end_sample = min(start_sample + len(resampled), total_samples)
         samples_to_mix = end_sample - start_sample
@@ -238,7 +249,7 @@ NUM_CHANNELS = 4
 channels = []
 for _ in range(NUM_CHANNELS):
     channels.append({
-        "events": [],
+        "events": [],          # each event: (time_offset, note, pitch, volume)
         "duration": 0.0,
         "recording": False,
         "playing": False,
@@ -279,6 +290,9 @@ class SessionOptionsDialog(QDialog):
         self.export_btn.clicked.connect(self.export_session)
         export_layout.addWidget(self.export_btn)
         layout.addLayout(export_layout)
+
+        # Connect Enter key to export
+        self.session_name_edit.returnPressed.connect(self.export_btn.click)
 
         import_btn = QPushButton("Import Session (.bqb)")
         import_btn.clicked.connect(self.import_session)
@@ -413,6 +427,7 @@ class LaunchpadGUI(QWidget):
         self.learn_mode = False
         self.recording_channel = None
         self.record_start_time = 0.0
+        self.oneshot_channels = []  # track one‑shot playback channels for overlap
 
         main_layout = QVBoxLayout()
 
@@ -594,20 +609,26 @@ class LaunchpadGUI(QWidget):
         def handler():
             self.buttons[note].setStyleSheet(self.active_style())
             if not self.allow_overlap:
-                pygame.mixer.stop()
+                # Stop only one‑shot channels, not loops
+                for ch in self.oneshot_channels:
+                    ch.stop()
+                self.oneshot_channels.clear()
             if note in loaded_sounds:
-                play_sound_with_pitch(note, current_pitch)
+                channel = play_sound_with_params(note, current_pitch, current_volume)
+                if channel and not self.allow_overlap:
+                    # Remember this channel for later overlap‑off stopping
+                    self.oneshot_channels.append(channel)
 
             if self.recording_channel is not None:
                 ch = channels[self.recording_channel]
                 if ch["recording"]:
                     t = time.time() - self.record_start_time
-                    ch["events"].append((t, note))
+                    ch["events"].append((t, note, current_pitch, current_volume))
 
             global session_recording, session_start_time, session_events
             if session_recording:
                 t = time.time() - session_start_time
-                session_events.append((t, note, current_pitch))
+                session_events.append((t, note, current_pitch, current_volume))
         return handler
 
     def make_release_handler(self, note):
@@ -646,7 +667,7 @@ class LaunchpadGUI(QWidget):
                 ch["recording"] = False
             self.recording_channel = None
             self.status_label.setText("Recording stopped")
-            pygame.mixer.stop()
+            # No pygame.mixer.stop() – loops continue
             for w in self.channel_widgets:
                 if w["record_btn"].isChecked():
                     w["record_btn"].setChecked(False)
@@ -710,7 +731,7 @@ class LaunchpadGUI(QWidget):
             ch["active_channels"].clear()
 
             start_time = time.time()
-            for t, note in events:
+            for t, note, pitch, volume in events:
                 if ch["stop_event"].is_set():
                     return
                 while (time.time() - start_time) < t:
@@ -718,13 +739,13 @@ class LaunchpadGUI(QWidget):
                         return
                     time.sleep(0.001)
                 if not ch["mute"] and note in loaded_sounds:
-                    c = play_sound_with_pitch(note, current_pitch)
+                    c = play_sound_with_params(note, pitch, volume)
                     if c:
                         ch["active_channels"].append(c)
                     global session_recording, session_start_time, session_events
                     if session_recording:
                         global_time = time.time() - session_start_time
-                        session_events.append((global_time, note, current_pitch))
+                        session_events.append((global_time, note, pitch, volume))
 
             if not ch["stop_event"].is_set():
                 elapsed = time.time() - start_time
@@ -739,7 +760,10 @@ class LaunchpadGUI(QWidget):
     def apply_control(self, action):
         global current_volume, current_pitch
         if action == "stop":
-            pygame.mixer.stop()
+            # Stop only one‑shot channels, not loops
+            for ch in self.oneshot_channels:
+                ch.stop()
+            self.oneshot_channels.clear()
         elif action == "vol_up":
             current_volume = min(1.0, current_volume + 0.1)
             for s in loaded_sounds.values():
@@ -837,20 +861,25 @@ def midi_listener(gui):
                 note = msg.note
                 if msg.velocity > 0:
                     if not gui.allow_overlap:
-                        pygame.mixer.stop()
+                        # Stop only one‑shot channels, not loops
+                        for ch in gui.oneshot_channels:
+                            ch.stop()
+                        gui.oneshot_channels.clear()
                     if note in loaded_sounds:
-                        play_sound_with_pitch(note, current_pitch)
+                        channel = play_sound_with_params(note, current_pitch, current_volume)
+                        if channel and not gui.allow_overlap:
+                            gui.oneshot_channels.append(channel)
 
                     if gui.recording_channel is not None:
                         ch = channels[gui.recording_channel]
                         if ch["recording"]:
                             t = time.time() - gui.record_start_time
-                            ch["events"].append((t, note))
+                            ch["events"].append((t, note, current_pitch, current_volume))
 
                     global session_recording, session_start_time, session_events
                     if session_recording:
                         t = time.time() - session_start_time
-                        session_events.append((t, note, current_pitch))
+                        session_events.append((t, note, current_pitch, current_volume))
 
                     gui.flash_button(note)
                     if gui.midi_out:
@@ -878,8 +907,22 @@ def midi_listener(gui):
 # --- Run ---
 if __name__ == "__main__":
     app = QApplication(sys.argv)
+
+    # Show boot logo splash screen
+    splash_pixmap = get_splash_pixmap()
+    if not splash_pixmap.isNull():
+        splash = QSplashScreen(splash_pixmap, Qt.WindowType.WindowStaysOnTopHint)
+        splash.show()
+        app.processEvents()  # let it appear
+
+    # Create main window
     gui = LaunchpadGUI()
     gui.show()
+
+    # Close splash screen after main window is shown or after a short delay
+    if 'splash' in locals():
+        QTimer.singleShot(2000, splash.close)  # close after 2 seconds
+
     t = threading.Thread(target=midi_listener, args=(gui,), daemon=True)
     t.start()
     sys.exit(app.exec())
