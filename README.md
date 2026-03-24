@@ -1,6 +1,6 @@
 # blaqpad
 
-<img width="1204" height="932" alt="Screenshot_2026-03-24_14-45-02" src="https://github.com/user-attachments/assets/329d2e6d-5684-41c9-ae48-71a169e8281b" />
+<img width="1204" height="932" alt="image" src="https://github.com/user-attachments/assets/a0bc1c4b-0f70-4229-bb17-6d59f43ed7d3" />
 
 A "powerful" looper and sampler designed for Novation Launchpad controllers. Create loops, assign samples, record your sessions, and manage your projects.
 
