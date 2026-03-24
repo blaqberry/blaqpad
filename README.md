@@ -1,6 +1,7 @@
 # blaqpad
 A "powerful" looper and sampler designed for Novation Launchpad controllers. Create loops, assign samples, record your sessions, and manage your projects.
 
+THIS HAS BEEN TESTED WITH A NOVATION LAUNCHPAD MINI ON MANJARO, FEEDBACK IS APPRECIATED!
 ---
 
 ## Features
